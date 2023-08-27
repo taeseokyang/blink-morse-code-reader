@@ -68,7 +68,6 @@ BLINK_LONG_TIME = 0.3
 close_eye_before = False
 open_mouse_before = False
 end_code_writing = True
-write_mode_on = True
 
 word = ""
 morse_code = ""
@@ -97,6 +96,7 @@ landmark_predict = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
 while 1:
         ret, frame = cam.read()
         frame = imutils.resize(frame, width=640)
+        frame = cv2.flip(frame,1)
 
         img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
   
@@ -129,9 +129,9 @@ while 1:
 
             # 탐지 영역 그리기
             cv2.rectangle(frame, (x, y), (x+w, y+h),(0, 255, 0), 2)
-            cv2.putText(frame, 'me',  (x, y-20), cv2.FONT_HERSHEY_DUPLEX, 0.7, (0, 200, 0), 1)
-            for (x, y) in shape[L_start: L_end]:cv2.circle(frame, (x, y), 1, (0, 0, 255), -1)
-            for (x, y) in shape[R_start: R_end]:cv2.circle(frame, (x, y), 1, (0, 0, 255), -1)
+            # cv2.putText(frame, 'me',  (x, y-20), cv2.FONT_HERSHEY_DUPLEX, 0.7, (0, 200, 0), 1)
+            # for (x, y) in shape[L_start: L_end]:cv2.circle(frame, (x, y), 1, (0, 0, 255), -1)
+            # for (x, y) in shape[R_start: R_end]:cv2.circle(frame, (x, y), 1, (0, 0, 255), -1)
 
             
             #입열림 판단
@@ -139,19 +139,12 @@ while 1:
                 open_mouse_before = True
                 open_mouse_time2 = time.time()
 
-                # 글자 삭제, 전체 삭제
-                if write_mode_on == False:
-                    if open_mouse_time2 - close_mouse_time <= REMOVE_WORD_TIME:
-                        cv2.putText(frame, str(REMOVE_WORD_TIME-(open_mouse_time2 - close_mouse_time))[:3]+"s left for remove all", (120, 300), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 200, 0), 1)
-                    else:
-                        word = ""
-                # 글자 삭제, 한 글자 삭제
+                # 글자 삭제
+                if open_mouse_time2 - close_mouse_time <= REMOVE_WORD_TIME:
+                    cv2.putText(frame, str(REMOVE_WORD_TIME-(open_mouse_time2 - close_mouse_time))[:3]+"s left for remove one", (120, 300), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 1)
                 else:
-                    if open_mouse_time2 - close_mouse_time <= REMOVE_WORD_TIME:
-                        cv2.putText(frame, str(REMOVE_WORD_TIME-(open_mouse_time2 - close_mouse_time))[:3]+"s left for remove one", (120, 300), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 200, 0), 1)
-                    else:
-                        word = word[:-1]#수정해야함.
-                        close_mouse_time = time.time()
+                    word = word[:-1]#수정해야함.
+                    close_mouse_time = time.time()
             else:
                 close_mouse_time = time.time()
                 open_mouse_before = False
@@ -174,7 +167,7 @@ while 1:
                 else:
                     close_eye_time_for_end_code = time.time() # 모스부호 확정을 위한 시간 끝
                     if close_eye_time_for_end_code - open_eye_time_for_end_code <= END_CODE_TIME:
-                        cv2.putText(frame, str(END_CODE_TIME-(close_eye_time_for_end_code - open_eye_time_for_end_code))[:3]+"s left for selct", (200, 30), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 200, 0), 1)
+                        cv2.putText(frame, str(END_CODE_TIME-(close_eye_time_for_end_code - open_eye_time_for_end_code))[:3]+"s left for selct", (200, 30), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 200), 1)
 
                     # 출력
                     if close_eye_time_for_end_code - open_eye_time_for_end_code > END_CODE_TIME and end_code_writing == False:
@@ -186,17 +179,22 @@ while 1:
                 close_eye_before = False
                     
             # 정보
-            cv2.putText(frame, morse_code, (shape[34][0]-(len(morse_code)*5+10),shape[34][1]+5), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 200, 0), 1)
-            cv2.putText(frame, "EAR:"+str(avg)[:4], (20, 70), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 200, 0), 1)
-            cv2.putText(frame, "MAR:"+str(mouse_MAR)[:4], (20, 90), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 200, 0), 1)
-            cv2.putText(frame,  "blink_time:"+str(blink_time)[:4], (20, 110), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 200, 0), 1)
+
+            cv2.putText(frame, "EAR:"+str(avg)[:4], (10, 20), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 200, 0), 1)
+            cv2.putText(frame, "MAR:"+str(mouse_MAR)[:4], (10, 40), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 200, 0), 1)
+            cv2.putText(frame,  "blink_time:"+str(blink_time)[:4], (10, 60), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 200, 0), 1)
+            
+            # 모스부호
+            cv2.putText(frame, morse_code, (shape[34][0]+30,shape[34][1]), cv2.FONT_HERSHEY_DUPLEX, 1, (200, 0, 0), 1)
+            # 문자열
             cv2.putText(frame, word,(2, 350), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 200, 0), 1)
+            # 현재 알파벳 출력 
             if morse_code in morse_code_decode:
-                cv2.putText(frame, morse_code_decode[morse_code],  shape[34]-20 , cv2.FONT_HERSHEY_DUPLEX, 1, (200, 0, 0), 1)
+                cv2.putText(frame, morse_code_decode[morse_code],  (shape[34][0]-70,shape[34][1]), cv2.FONT_HERSHEY_DUPLEX, 1, (200, 0, 0), 1)
             break
 
         
-        cv2.imshow('Video', frame)
+        cv2.imshow('Morse Eye', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
   
