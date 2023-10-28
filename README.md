@@ -16,9 +16,9 @@ python morse_eye.py
 모스부호를 눈으로 표현 한 후 일정시간 기다리면 확정 선택됨.
 
 This program recognizes your eye blinks.
-Try blinking your eyes to send Morse code.
+Try blinking your eyes to say someword as Morse code.
 
-## 주의
+## 주의 사항
 
 너무 얼굴이 가까우면 인식 정확도가 떨어질 수 있음.
 
