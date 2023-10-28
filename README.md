@@ -18,4 +18,8 @@ python morse_eye.py
 This program recognizes your eye blinks.
 Try blinking your eyes to send Morse code.
 
+## 주의
+
+너무 얼굴이 가까우면 인식 정확도가 떨어질 수 있음.
+
 
